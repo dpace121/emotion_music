@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Emotion Based Music</title>
+   <style>
+    body {
+        font-family: 'Arial', sans-serif;
+        background-color: #b4bdc5;
+        background: full;
+        margin: 0;
+        text-align: center;
+        padding: 0;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        flex-direction: column;
+        color: #333;
+    }
+    
+    header {
+        width: 100%;
+        font-size: 2.5em;
+        color: white;
+        background: green;
+        margin-bottom: 10px;
+        text-align: center;
+    }
+    
+    h3 {
+        color: #350707;
+        text-align: center;
+    }
+    
+    #video {
+        border: 1px solid #131311;
+        border-radius: 8px;
+        width: 38%;
+        margin-bottom: 20px;
+        box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+    }
+    p{
+        font-size: 1em;
+    }
+    
+    #capture {
+        background-color: black;
+        color: white;
+        padding: 15px 30px;
+        font-size: 1.2em;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: background-color 0.3s ease;
+    }
+    
+    #capture:hover {
+        background-color: #5749e2;
+    }
+    
+    #canvas {
+        display: none;
+    }
+    @media screen and (max-width: 768px) {
+        #video {
+            width: 60%;
+        }
+    
+        #capture {
+            width: 40%;
+            font-size: 12px;
+        }
+    }
+    
+    footer {
+        font-size: 1.5em;
+        color: white;
+        background:green;
+        text-align: center;
+        width: 100%; 
+    }
+    
+    </style>
+</head>
+<body>
+    <header>Emotion Based Music Recommendation System</header>
+    <h3>Hello, buddy! Let's try to predict your emotion:</h3>
+    <video id="video" autoplay></video>
+    <button id="capture">Capture Emotion</button>
+    <p>Thank you for your patience!</p>
+    <canvas id="canvas" style="display:none;"></canvas>
+    <footer>
+        &copy; 2024 Emotion Based Music Recommendation System. All rights reserved.
+    </footer>
+    <script>
+        const video = document.getElementById('video');
+        const canvas = document.getElementById('canvas');
+        const context = canvas.getContext('2d');
+
+        // Start video stream
+        navigator.mediaDevices.getUserMedia({ video: true })
+            .then(stream => {
+                video.srcObject = stream;
+            });
+
+        // Capture button logic
+        document.getElementById('capture').addEventListener('click', () => {
+            // Pause the video feed
+            video.pause();
+
+            // Draw the current frame on the canvas
+            canvas.width = video.videoWidth;
+            canvas.height = video.videoHeight;
+            context.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+            // Convert the canvas to a data URL (image)
+            const image = canvas.toDataURL('image/png');
+
+            // Send the image to the server for emotion detection
+            fetch('/process_emotion/', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ image })
+            })
+                .then(response => response.json())
+                .then(data => {
+                    alert(`Detected Emotion: ${data.emotion}`);
+                    // Redirect to the recommendation page
+                    window.location.href = `/recommend_songs/?emotion=${data.emotion}`;
+                })
+                .catch(error => {
+                    alert('An error occurred while processing your emotion.');
+                    console.error(error);
+
+                    // Resume the video feed in case of an error
+                    video.play();
+                });
+        });
+    </script>
+</body>
+
+</html>
