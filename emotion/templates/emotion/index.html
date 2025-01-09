@@ -1,0 +1,188 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Emotion Detection</title>
+    <link rel="stylesheet" href="{% static 'emotion/styles.css' %}">
+    <style>
+    * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Arial', sans-serif;
+            margin: 0;
+            text-align: center;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            color: #333;
+        }
+
+        header {
+            font-family:Arial, monospace; /* Monospace font for typing effect */
+            font-size: 36px;
+            border-right: 4px solid black; /* Simulate the cursor */
+            white-space: nowrap; /* Prevent text from wrapping */
+            overflow: hidden; /* Hide text overflow */
+            width: 0; /* Start with 0 width */
+            margin:20px;
+            animation: typing 4s steps(40) 1s forwards, blink-caret 0.75s;
+            }
+    
+            /* Typing animation */
+            @keyframes typing {
+            from {
+                width: 0; /* Start with no text */
+            }
+            to {
+                width: 50%; /* End with the full text */
+            }
+            }
+    
+            /* Blinking cursor animation */
+            @keyframes blink-caret {
+            50% {
+                border-color: transparent; /* Hide the cursor at the middle of the cycle */
+            }
+        }
+          
+          h3 {
+            display: inline-block;
+            white-space: nowrap;
+            margin:  10px 10px;
+          
+          }
+          
+          #video {
+            width: 100%;
+            max-width: 500px;
+            height: auto;  /* Maintains aspect ratio */
+            border: 1px solid black;  /* A vibrant border for better visibility */
+            border-radius: 12px;  /* More rounded corners for a modern look */
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);  /* Subtle shadow for depth */
+            margin-bottom: 20px;
+            transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;  /* Smooth transition for interactivity */
+          }
+
+        p {
+            font-size: 18px;
+            font-weight: bold;
+            color: #4CAF50; /* Green for a positive feel */
+            text-align: center;
+            margin-top: 10px;        }
+
+        #capture {
+            background-color: black;
+            color: white;
+            padding: 15px 30px;
+            font-size: 1.2em;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        #capture:hover {
+            background-color: #5749e2;
+        }
+
+        #canvas {
+            display: none;
+        }
+
+        @media screen and (max-width: 768px) {
+            #video {
+                width: 60%;
+            }
+
+            #capture {
+                width: 45%;
+                font-size: 12px;
+            }
+        }
+
+          footer {
+            margin-top: 10px;
+            bottom: 10px;
+            font-size: 0.9em;
+            color: black;
+            text-align: center;
+            width: 100%;
+        }
+ </style>
+ 
+
+</head>
+
+<body>
+    <header>Tailoring Music According To Your Moods</header>
+    <h3>"Hello, buddy! How are you feeling today? 😊 Let’s detect your emotions and understand you better! 💡"</h3>
+    <video id="video" autoplay></video>
+    <button id="capture">Capture Emotion</button>
+    <p>Thank you for your patience! Patience unlocks the power of understanding emotions 🕰️💡😊</p>
+    <canvas id="canvas" style="display:none;"></canvas>
+    <footer>
+        &copy; 2024 All rights reserved.
+    </footer>
+    <script>
+        const video = document.getElementById('video');
+        const canvas = document.getElementById('canvas');
+        const context = canvas.getContext('2d');
+
+        // Start video stream
+        navigator.mediaDevices.getUserMedia({ video: true })
+            .then(stream => {
+                video.srcObject = stream;
+            });
+
+        // Capture button logic
+        document.getElementById('capture').addEventListener('click', () => {
+            // Pause the video feed
+            video.pause();
+
+            // Draw the current frame on the canvas
+            canvas.width = video.videoWidth;
+            canvas.height = video.videoHeight;
+            context.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+            // Convert the canvas to a data URL (image)
+            const image = canvas.toDataURL('image/png');
+
+            // Send the image to the server for emotion detection
+            fetch('/process_emotion/', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ image })
+            })
+                .then(response => {
+                    if (!response.ok) {
+                        // Handle errors based on status codes
+                        return response.json().then(errorData => {
+                            throw new Error(errorData.error || 'An error occurred');
+                        });
+                    }
+                    return response.json();  // Only proceed if response is OK
+                })
+                .then(data => {
+                    alert(`Detected Emotion: ${data.emotion}`);
+                    // Redirect to the recommendation page
+                    window.location.href = `/recommend_songs/?emotion=${data.emotion}`;
+                })
+                .catch(error => {
+                    alert('No faces detected .');
+                    console.error(error);
+
+                    // Resume the video feed in case of an error
+                    video.play();
+                });
+        });
+    </script>
+</body>
+
+</html>

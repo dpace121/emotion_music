@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Recommended Songs</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: white;
+            margin: 0;
+            padding: 0;
+            color: #333;
+        }
+
+        header {
+            width: 100%;
+            font-size: 2.5em; /* Adjust font size for readability */
+            color: grey;
+            text-align: center;
+            padding: 20px 0; /* Adds padding for space around the text */
+            margin: 0; /* Removes default margin to make it fit perfectly */
+            font-family: 'Arial', sans-serif; /* More readable font */
+        }
+
+        h1 {
+            text-align: center;
+            font-size: 1.5rem;
+            margin-bottom: 10px;
+            color: coral;
+        }
+        h3{
+            text-align:center;
+        }
+
+    ul {
+        list-style-type:none;
+        padding: 0;
+        margin: 25px auto;
+        width: 70%;
+        max-width: 600px;
+        }
+
+    li {
+        margin: 10px 0;
+        padding: 15px;
+        border-radius: 8px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+    li:hover {
+        transform: translateY(-5px);
+        }
+        
+    a {
+        text-decoration: none;
+        color: green;
+        font-size: 18px;
+        font-weight: bold;
+        display: block;
+        text-align: center;
+        }
+
+    a:hover {
+        color: blue;
+        text-decoration: underline;
+        }
+
+    .back-btn {
+        display: inline-block;
+        margin: 20px auto;
+        padding: 10px 20px;
+        background-color: black;
+        color: red;
+        font-size: 18px;
+        border-radius: 5px;
+        text-align: center;
+        text-decoration: none;
+        }
+
+    .back-btn:hover {
+        background-color: green;
+        } 
+
+    .song-list {
+            list-style: none;
+            padding: 0;
+            display: flex;
+            flex-wrap: wrap; /* Wrap items on smaller screens */
+            gap: 10px; /* Space between song cards */
+            }
+    .song-item {
+            text-align: center;
+            max-width: 180px;
+            }
+    
+    /* Image styling */
+    .song-image {
+            width: 90%;
+            height: auto;
+            border-radius: 8px; /* Optional: Rounded corners */
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Subtle shadow */
+            transition: transform 0.3s ease; /* Smooth zoom effect on hover */
+            }
+            
+        /* Zoom effect on hover */
+            .song-image:hover {
+                transform: scale(1.05);
+            }
+            
+        /* Title and link styling */
+        .song-link {
+                display: block;
+                margin-top: 10px;
+                text-decoration: none;
+                color: #333;
+                font-weight: bold;
+                transition: color 0.3s ease; /* Smooth color change on hover */
+            }
+            
+        /* Link hover effect */
+            .song-link:hover {
+                color: #0073e6; /* Highlight color on hover */
+            }
+            footer {
+                bottom: 10px;
+                font-size: 0.9em;
+                color: black;
+                text-align: center;
+                width: 100%;
+            }
+    </style> 
+</head>
+<body>
+    <header>Tailoring Music According To Your Moods</header>
+    <h1>Recommended Songs for {{ emotion }} Emotion</h1>
+    <h3>Enjoy the music and let your feelings flow. 🎶</h3>
+    <ul class="song-list">
+        {% for song in songs %}
+        <li class="song-item">
+            <a href="{{ song.url }}" target="_blank">
+                <img src="{{ song.image_url }}" alt="{{ song.title }}" class="song-image">
+            </a>
+            <a href="{{ song.url }}" target="_blank" class="song-link">{{ song.title }} by {{ song.artist }}</a>
+        </li>
+        {% endfor %}
+    </ul>
+    <a href="/">Back</a>
+    <footer>
+        &copy; 2024 All rights reserved.
+        </footer>
+</body>
+</html>
