@@ -1,1 +1,1 @@
-# emotion_music
+Hello, this is an emotion based music recommendation system created using Django and django-admin which detects person's four emotions(Happy, Sad, Calm, Angry) and recommend songs according to detected emotions..
